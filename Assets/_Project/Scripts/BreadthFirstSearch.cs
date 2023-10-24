@@ -12,7 +12,8 @@ public class BreadthFirstSearch : MonoBehaviour
     [SerializeField] private TileBase defaultTile;
     [SerializeField] private TileBase originTile;
     [SerializeField] private TileBase objectiveTile;
-    [SerializeField] private TileBase infectedTile;
+    [SerializeField] private TileBase fillTile;
+    [SerializeField] private TileBase pathToFollowTile;
 
     [Space]
     [SerializeField] private Tilemap tileMap;
@@ -23,7 +24,8 @@ public class BreadthFirstSearch : MonoBehaviour
     enum Version{
         JustPoints,
         ReachedAndFill,
-        CameFrom
+        CameFrom,
+        EndEarly
     }
 
     [Header("Visual Vars")]
@@ -35,12 +37,16 @@ public class BreadthFirstSearch : MonoBehaviour
 
     private Queue<Vector3Int> _frontier;
     private HashSet<Vector3Int> _reached;
-    private Dictionary<Vector3Int, Vector3Int> _cameFrom;
+    private Dictionary<Vector3Int, Vector3Int?> _cameFrom;
 
-    private bool _isInfected = false;
+    private TileBase CurrentTile=> _isFilled ? defaultTile : fillTile;
+    private TileBase AlternativeCurrentTile => _isFilled ? defaultTile : fillTile;
+    private bool _isFilled = false;
 
     private void OnSelectTile(TileBase tileSelected, Vector3Int cellPos)
     {
+        if (algorithmCor != null) return;
+
         if (originPos == null)
         {
             originPos = cellPos;
@@ -67,25 +73,31 @@ public class BreadthFirstSearch : MonoBehaviour
     private void DoAlgorithim()
     {
         _frontier = new Queue<Vector3Int>();
+
         if(version == Version.ReachedAndFill)
+        {
             _reached = new HashSet<Vector3Int>();
+            algorithmCor = StartCoroutine(FillAlgorithmCoroutine());
+        }
 
-        if(version == Version.CameFrom)
-            _cameFrom = new Dictionary<Vector3Int, Vector3Int>();
+        if (version == Version.CameFrom || version == Version.EndEarly)
+        {
+            _cameFrom = new Dictionary<Vector3Int, Vector3Int?>();
+            algorithmCor = StartCoroutine(CameFromAlgorithmCoroutine());
+        }
 
-        _breadthCoroutine = StartCoroutine(BreadthCoroutine());
     }
 
-    private Coroutine _breadthCoroutine = null;
-    private IEnumerator BreadthCoroutine()
+    private Coroutine algorithmCor = null;
+    private IEnumerator FillAlgorithmCoroutine()
     {
         AddToFrontier(originPos.Value);
         AddToReached(originPos.Value);
 
         while (_frontier.Count > 0)
         {
-            var currentPos = _frontier.Dequeue();
-            foreach (var neighbour in tileMap.GetNeighbours(currentPos))
+            var current = _frontier.Dequeue();
+            foreach (var neighbour in tileMap.GetNeighbours(current))
             {
                 if (_reached.Contains(neighbour)) continue;
                 //Si no se ha alcanzado el vecino, se añade a la frontera y a los tiles alcanzados
@@ -98,12 +110,12 @@ public class BreadthFirstSearch : MonoBehaviour
             yield return new WaitForSeconds(_secondsPerNeighbourChange);
         }
 
-        EndAlgorithmCoroutine();
+        EndAlgorithm();
 
         void AddToFrontier(Vector3Int pos)
         {
             _frontier.Enqueue(pos);
-            tileMap.SetTile(pos, GetInfectedTile());
+            tileMap.SetTile(pos, CurrentTile);
         }
 
         void AddToReached(Vector3Int pos)
@@ -113,19 +125,101 @@ public class BreadthFirstSearch : MonoBehaviour
         }
     }
 
-    private void EndAlgorithmCoroutine()
+    private IEnumerator CameFromAlgorithmCoroutine()
     {
-        ResetPositions();
-        _isInfected = !_isInfected;
-        _breadthCoroutine = null;
+        AddToFrontier(originPos.Value);
+        AddToCameFrom(originPos.Value, null);
+
+        while (_frontier.Count > 0)
+        {
+            bool endEarly = false;
+
+            var current = _frontier.Dequeue();
+            foreach (var neighbour in tileMap.GetNeighbours(current))
+            {
+                if (_cameFrom.ContainsKey(neighbour)) continue;
+                //Si no se ha alcanzado el vecino, se añade a la frontera y a los tiles de donde viene
+                AddToFrontier(neighbour);
+                AddToCameFrom(neighbour, current);
+                if(neighbour == objectivePos && version == Version.EndEarly)
+                {
+                    endEarly = true;
+                    break;
+                }
+                yield return new WaitForSeconds(_secondsPerTileChange);
+            }
+
+            if (endEarly) break;
+
+            yield return new WaitForSeconds(_secondsPerNeighbourChange);
+        }
+
+        PaintFollowPathAndEndAlgorithm();
+
+        void AddToFrontier(Vector3Int pos)
+        {
+            _frontier.Enqueue(pos);
+            tileMap.SetTile(pos, CurrentTile);
+        }
+
+        void AddToCameFrom(Vector3Int current, Vector3Int? from)
+        {
+            _cameFrom.Add(current, from);
+            //tileMap.SetTile(pos, GetInfectedTile());
+        }
     }
 
-    private TileBase GetInfectedTile() => _isInfected ? defaultTile : infectedTile;
-
-    private void ResetPositions()
+    private void EndAlgorithm()
     {
-        tileMap.SetTile(originPos.Value, GetInfectedTile());
-        tileMap.SetTile(objectivePos.Value, GetInfectedTile());
+        ResetPositions();
+        _isFilled = !_isFilled;
+        algorithmCor = null;
+        Debug.Log("End Algorithm");
+    }
+
+    private void EndAlgorithmWithPath()
+    {
+        ResetPositions(pathToFollowTile, pathToFollowTile);
+        _isFilled = !_isFilled;
+        algorithmCor = null;
+        Debug.Log("End Algorithm");
+    }
+
+    private void PaintFollowPathAndEndAlgorithm()
+    {
+        //Este codigo lo que hace es obtener el tile contrario para ser reemplazado por el actual
+        //Despues devuelve el flag
+        _isFilled = !_isFilled;
+        var tileToChange = CurrentTile;
+        _isFilled = !_isFilled;
+        tileMap.SwapTile(tileToChange, CurrentTile);
+
+        Vector3Int? from = objectivePos.Value;
+        List<Vector3Int> pathToFollow = new();
+        while (from != null)
+        {
+            pathToFollow.Add(from.Value);
+            from = _cameFrom[from.Value];
+        }
+
+        foreach(var cell in pathToFollow)
+        {
+            tileMap.SetTile(cell, pathToFollowTile);
+        }
+
+        EndAlgorithmWithPath();
+        Debug.Log("End Algorithm");
+    }
+
+
+    private void ResetPositions(TileBase origintile = null, TileBase objectiveTile = null)
+    {
+        origintile ??= CurrentTile;
+        objectiveTile ??= CurrentTile;
+
+        tileMap.SetTile(originPos.Value, origintile);
+        tileMap.SetTile(objectivePos.Value, objectiveTile);
+
         originPos = null;
         objectivePos = null;
     }

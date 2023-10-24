@@ -18,10 +18,10 @@ public static class TileMapExtensions
         var fourth = origin;
         fourth.y -= 1;
 
+        neighbours.Add(fourth);
+        neighbours.Add(third);
         neighbours.Add(first);
         neighbours.Add(second);
-        neighbours.Add(third);
-        neighbours.Add(fourth);
 
         if(!includeEmpty)
             neighbours = neighbours.Where(pos => tileMap.GetTile(pos) != null).ToList();
