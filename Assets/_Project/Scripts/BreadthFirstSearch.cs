@@ -25,7 +25,8 @@ public class BreadthFirstSearch : MonoBehaviour
         JustPoints,
         ReachedAndFill,
         CameFrom,
-        EndEarly
+        EndEarly,
+        EndEarlyAndFill
     }
 
     [Header("Visual Vars")]
@@ -40,7 +41,7 @@ public class BreadthFirstSearch : MonoBehaviour
     private Dictionary<Vector3Int, Vector3Int?> _cameFrom;
 
     private TileBase CurrentTile=> _isFilled ? defaultTile : fillTile;
-    private TileBase AlternativeCurrentTile => _isFilled ? defaultTile : fillTile;
+    private TileBase AlternativeCurrentTile => _isFilled ? fillTile : defaultTile;
     private bool _isFilled = false;
 
     private void OnSelectTile(TileBase tileSelected, Vector3Int cellPos)
@@ -80,7 +81,7 @@ public class BreadthFirstSearch : MonoBehaviour
             algorithmCor = StartCoroutine(FillAlgorithmCoroutine());
         }
 
-        if (version == Version.CameFrom || version == Version.EndEarly)
+        if (version == Version.CameFrom || version == Version.EndEarly || version == Version.EndEarlyAndFill)
         {
             _cameFrom = new Dictionary<Vector3Int, Vector3Int?>();
             algorithmCor = StartCoroutine(CameFromAlgorithmCoroutine());
@@ -141,7 +142,7 @@ public class BreadthFirstSearch : MonoBehaviour
                 //Si no se ha alcanzado el vecino, se añade a la frontera y a los tiles de donde viene
                 AddToFrontier(neighbour);
                 AddToCameFrom(neighbour, current);
-                if(neighbour == objectivePos && version == Version.EndEarly)
+                if(neighbour == objectivePos && (version == Version.EndEarly || version == Version.EndEarlyAndFill))
                 {
                     endEarly = true;
                     break;
@@ -187,12 +188,11 @@ public class BreadthFirstSearch : MonoBehaviour
 
     private void PaintFollowPathAndEndAlgorithm()
     {
-        //Este codigo lo que hace es obtener el tile contrario para ser reemplazado por el actual
-        //Despues devuelve el flag
-        _isFilled = !_isFilled;
-        var tileToChange = CurrentTile;
-        _isFilled = !_isFilled;
-        tileMap.SwapTile(tileToChange, CurrentTile);
+        if (version == Version.EndEarlyAndFill)
+        {
+            tileMap.SwapTile(AlternativeCurrentTile, CurrentTile);
+            tileMap.SwapTile(pathToFollowTile, CurrentTile);
+        }
 
         Vector3Int? from = objectivePos.Value;
         List<Vector3Int> pathToFollow = new();

@@ -2980,11 +2980,12 @@ MonoBehaviour:
   defaultTile: {fileID: 11400000, guid: 4b1fdd61d33d9914b8995e0339b27c35, type: 2}
   originTile: {fileID: 11400000, guid: b20845e2a1f595a4f9561cf4393dfc17, type: 2}
   objectiveTile: {fileID: 11400000, guid: e286f8df28ccb514288ecdb7cf688ddc, type: 2}
-  infectedTile: {fileID: 11400000, guid: 771e4f04583903a4d96d2247abf3b847, type: 2}
+  fillTile: {fileID: 11400000, guid: 771e4f04583903a4d96d2247abf3b847, type: 2}
+  pathToFollowTile: {fileID: 11400000, guid: a96bb1547d16bf74cba63db4f5962570, type: 2}
   tileMap: {fileID: 351174319}
-  version: 1
-  _secondsPerTileChange: 0.01
-  _secondsPerNeighbourChange: 0.05
+  version: 3
+  _secondsPerTileChange: 0.001
+  _secondsPerNeighbourChange: 0.005
 --- !u!4 &1670054907
 Transform:
   m_ObjectHideFlags: 0
