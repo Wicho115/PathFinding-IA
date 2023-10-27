@@ -12,8 +12,8 @@ public class CustomTile : Tile
 
     public override bool StartUp(Vector3Int position, ITilemap tilemap, GameObject go)
     {
-        var success = StartUp(position, tilemap, go);
-        Position = position;
+        var success = base.StartUp(position, tilemap, go);
+        Debug.Log(position);
         return success;
     }
 }

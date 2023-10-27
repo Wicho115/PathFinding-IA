@@ -36,8 +36,9 @@ public class DijkstrasAlgorithm : MonoBehaviour
     private Vector3Int? originPos;
     private Vector3Int? objectivePos;
 
-    private Queue<Vector3Int> _frontier;
+    private PriorityQueue<Vector3Int> _frontier;
     private Dictionary<Vector3Int, Vector3Int?> _cameFrom;
+    private Dictionary<Vector3Int, int> _costSoFar;
 
     private void OnMoveSelection(OnMoveSelectionArgs args)
     {
@@ -53,8 +54,9 @@ public class DijkstrasAlgorithm : MonoBehaviour
 
     private void DoAlgorithim()
     {
-        _frontier = new Queue<Vector3Int>();
+        _frontier = new PriorityQueue<Vector3Int>();
         _cameFrom = new Dictionary<Vector3Int, Vector3Int?>();
+        _costSoFar = new Dictionary<Vector3Int, int>();
 
         algorithmCor = StartCoroutine(CameFromAlgorithmCoroutine());
     }
@@ -63,24 +65,34 @@ public class DijkstrasAlgorithm : MonoBehaviour
 
     private IEnumerator CameFromAlgorithmCoroutine()
     {
-        _frontier.Enqueue(originPos.Value);
+        _frontier.Enqueue(originPos.Value, 0);
         _cameFrom.Add(originPos.Value, null);
+        _costSoFar.Add(originPos.Value, 0);
 
         while (_frontier.Count > 0)
         {
             bool endEarly = false;
 
             var current = _frontier.Dequeue();
-            foreach (var neighbour in tileMap.GetNeighbours(current))
+
+            foreach (var next in tileMap.GetNeighbours(current))
             {
-                if (_cameFrom.ContainsKey(neighbour)) continue;
+                var nextTile = tileMap.GetTile(next) as CustomTile;
+                if (nextTile == null) continue;
+
+                var newCost = _costSoFar[current] + nextTile.Cost;
+                if (!_costSoFar.ContainsKey(next) || newCost < _costSoFar[next])
+                {
+                    _costSoFar.Add(next, newCost);
+                    var priority = newCost;
+                    _frontier.Enqueue(next, priority);
+                    _cameFrom.Add(next, current);
+                }
 
                 //Si no se ha alcanzado el vecino, se añade a la frontera y a los tiles de donde viene
-                _frontier.Enqueue(neighbour);
-                _cameFrom.Add(neighbour, current);
 
                 //Si el vecino es el final, se  termina
-                if (neighbour == objectivePos && _endEarly)
+                if (next == objectivePos && _endEarly)
                 {
                     endEarly = true;
                     break;
@@ -110,6 +122,7 @@ public class DijkstrasAlgorithm : MonoBehaviour
 
         foreach (var cell in pathToFollow)
         {
+            Debug.Log("Draw on cell: " + cell.ToString());
             tileDrawer.Draw(cell, pathToFollowTile);
         }
 
@@ -119,8 +132,8 @@ public class DijkstrasAlgorithm : MonoBehaviour
 
     private void ResetPositions()
     {
-        tileDrawer.UnDraw(originPos.Value);
-        tileDrawer.UnDraw(objectivePos.Value);
+        tileDrawer.Draw(originPos.Value, pathToFollowTile);
+        tileDrawer.Draw(objectivePos.Value, pathToFollowTile);
 
         originPos = null;
         objectivePos = null;

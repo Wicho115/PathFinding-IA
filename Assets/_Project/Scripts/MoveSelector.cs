@@ -8,6 +8,11 @@ public class MoveSelector : MonoBehaviour
 {
     [SerializeField] private TileSelector selector;
 
+    [Header("Draw")]
+    [SerializeField] private TileDrawer drawer;
+    [SerializeField] private TileBase originTileDraw;
+    [SerializeField] private TileBase objectiveTileDraw;
+
     public delegate void OnMoveSelectionDel(OnMoveSelectionArgs args);
     public event OnMoveSelectionDel OnMoveSelectionDone;
 
@@ -20,16 +25,19 @@ public class MoveSelector : MonoBehaviour
 
     private void OnSelectedTile(TileBase tile, Vector3Int pos)
     {
-        var customTile = tile as CustomTile;
-        if (customTile == null) return; 
+        var customTile = (CustomTile)tile;
+        if (customTile == null) return;
 
-        if(originTile == null)
+
+        if (originTile == null)
         {
             originTile = customTile;
+            drawer.Draw(pos, originTileDraw);
             return;
         }
 
         objectiveTile = customTile;
+        drawer.Draw(pos, objectiveTileDraw);
 
         OnMoveSelectionDone?.Invoke(new OnMoveSelectionArgs(originTile, objectiveTile));
 
