@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -8,7 +6,7 @@ public class TileSelector : MonoBehaviour
 {
     [SerializeField] private Tilemap tileMap;
 
-    public event Action<TileBase, Vector3Int> OnSelectTile;
+    public event Action<CustomTile, Vector3Int> OnSelectTile;
 
     void Update()
     {
@@ -19,6 +17,8 @@ public class TileSelector : MonoBehaviour
         var cellPos = tileMap.WorldToCell(mouseWorldPos);
         var tile = tileMap.GetTile(cellPos);
         if (tile == null) return;
-        OnSelectTile?.Invoke(tile, cellPos);
+        var customTile = tile as CustomTile;
+        if (customTile == null) return;
+        OnSelectTile?.Invoke(customTile, cellPos);
     }
 }

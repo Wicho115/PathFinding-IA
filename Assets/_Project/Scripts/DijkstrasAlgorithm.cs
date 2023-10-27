@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
 public class DijkstrasAlgorithm : MonoBehaviour
 {
-    [SerializeField] private MoveSelector moveSelector;
+    [FormerlySerializedAs("moveSelector")] [SerializeField] private PathSelector pathSelector;
 
     [Space]
     [SerializeField] private TileBase defaultTile;
@@ -33,21 +34,18 @@ public class DijkstrasAlgorithm : MonoBehaviour
     [SerializeField, Min(0)] private float _secondsPerTileChange;
     [SerializeField, Min(0)] private float _secondsPerNeighbourChange;
 
-    private Vector3Int? originPos;
-    private Vector3Int? objectivePos;
+    private Vector3Int _originPos, _objectivePos;
 
     private PriorityQueue<Vector3Int> _frontier;
     private Dictionary<Vector3Int, Vector3Int?> _cameFrom;
     private Dictionary<Vector3Int, int> _costSoFar;
 
-    private void OnMoveSelection(OnMoveSelectionArgs args)
+    private void OnPathSelection(OnMoveSelectionArgs args)
     {
         if (algorithmCor != null) return;
-        originPos = args.origin.Position;
-        objectivePos = args.objective.Position;
 
-        Debug.Log($"Origen: {originPos}");
-        Debug.Log($"Objetivo: {objectivePos}");
+        _originPos = args.originPos;
+        _objectivePos = args.objectivePos;
 
         DoAlgorithim();
     }
@@ -65,9 +63,10 @@ public class DijkstrasAlgorithm : MonoBehaviour
 
     private IEnumerator CameFromAlgorithmCoroutine()
     {
-        _frontier.Enqueue(originPos.Value, 0);
-        _cameFrom.Add(originPos.Value, null);
-        _costSoFar.Add(originPos.Value, 0);
+        yield return null;
+        _frontier.Enqueue(_originPos, 0);
+        _cameFrom.Add(_originPos, null);
+        _costSoFar.Add(_originPos, 0);
 
         while (_frontier.Count > 0)
         {
@@ -89,29 +88,28 @@ public class DijkstrasAlgorithm : MonoBehaviour
                     _cameFrom.Add(next, current);
                 }
 
-                //Si no se ha alcanzado el vecino, se añade a la frontera y a los tiles de donde viene
+                //Si no se ha alcanzado el vecino, se aÃ±ade a la frontera y a los tiles de donde viene
 
                 //Si el vecino es el final, se  termina
-                if (next == objectivePos && _endEarly)
+                if (next == _objectivePos && _endEarly)
                 {
                     endEarly = true;
                     break;
                 }
-                yield return new WaitForSeconds(_secondsPerTileChange);
+                //yield return new WaitForSeconds(_secondsPerTileChange);
             }
 
             if (endEarly) break;
 
-            yield return new WaitForSeconds(_secondsPerNeighbourChange);
+            //yield return new WaitForSeconds(_secondsPerNeighbourChange);
         }
 
         PaintFollowPathAndEndAlgorithm();
-
     }
 
     private void PaintFollowPathAndEndAlgorithm()
     {
-        Vector3Int? from = objectivePos.Value;
+        Vector3Int? from = _objectivePos;
         List<Vector3Int> pathToFollow = new();
 
         while (from != null)
@@ -122,30 +120,22 @@ public class DijkstrasAlgorithm : MonoBehaviour
 
         foreach (var cell in pathToFollow)
         {
-            Debug.Log("Draw on cell: " + cell.ToString());
             tileDrawer.Draw(cell, pathToFollowTile);
         }
-
-        ResetPositions();
+        
+        tileDrawer.Draw(_originPos, pathToFollowTile);
+        tileDrawer.Draw(_objectivePos, pathToFollowTile);
+        
         algorithmCor = null;
-    }
-
-    private void ResetPositions()
-    {
-        tileDrawer.Draw(originPos.Value, pathToFollowTile);
-        tileDrawer.Draw(objectivePos.Value, pathToFollowTile);
-
-        originPos = null;
-        objectivePos = null;
     }
 
     private void OnEnable()
     {
-        moveSelector.OnMoveSelectionDone += OnMoveSelection;
+        pathSelector.OnMoveSelectionDone += OnPathSelection;
     }
 
     private void OnDisable()
     {
-        moveSelector.OnMoveSelectionDone -= OnMoveSelection;
+        pathSelector.OnMoveSelectionDone -= OnPathSelection;
     }
 }

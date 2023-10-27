@@ -4,45 +4,53 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 [RequireComponent(typeof(TileSelector))]
-public class MoveSelector : MonoBehaviour
+public class PathSelector : MonoBehaviour
 {
     [SerializeField] private TileSelector selector;
 
     [Header("Draw")]
     [SerializeField] private TileDrawer drawer;
-    [SerializeField] private TileBase originTileDraw;
-    [SerializeField] private TileBase objectiveTileDraw;
+    [SerializeField] private CustomTile originTileDraw;
+    [SerializeField] private CustomTile objectiveTileDraw;
 
     public delegate void OnMoveSelectionDel(OnMoveSelectionArgs args);
     public event OnMoveSelectionDel OnMoveSelectionDone;
 
     private CustomTile originTile, objectiveTile;
+    private Vector3Int originPos, objectivePos;
 
     private void Awake()
     {
         selector ??= GetComponent<TileSelector>();
     }
 
-    private void OnSelectedTile(TileBase tile, Vector3Int pos)
+    private void OnSelectedTile(CustomTile tile, Vector3Int pos)
     {
-        var customTile = (CustomTile)tile;
-        if (customTile == null) return;
-
-
+        if (objectiveTile != null)
+        {
+            drawer.UnDrawAll();
+            originTile = null;
+            objectiveTile = null;
+        }
+        Debug.Log("CUSTOM TILE: " + tile.name);
+        Debug.Log("CUSTOM TILE COST: " + tile.Cost);
+        Debug.Log("CUSTOM TILE POS: " + pos);
+        
         if (originTile == null)
         {
-            originTile = customTile;
+            originTile = tile;
+            originPos = pos;
             drawer.Draw(pos, originTileDraw);
             return;
         }
 
-        objectiveTile = customTile;
+        objectiveTile = tile;
+        objectivePos = pos;
         drawer.Draw(pos, objectiveTileDraw);
 
-        OnMoveSelectionDone?.Invoke(new OnMoveSelectionArgs(originTile, objectiveTile));
+        OnMoveSelectionDone?.Invoke(new OnMoveSelectionArgs(originTile, objectiveTile, originPos, objectivePos));
 
-        originTile = null;
-        objectiveTile = null;
+        
     }
 
     private void OnEnable()
@@ -57,12 +65,16 @@ public class MoveSelector : MonoBehaviour
 }
 public struct OnMoveSelectionArgs
 {
+    public Vector3Int originPos;
     public CustomTile origin { get; set; }
+    public Vector3Int objectivePos;
     public CustomTile objective { get; set; }
 
-    public OnMoveSelectionArgs(CustomTile origin, CustomTile objective)
+    public OnMoveSelectionArgs(CustomTile origin, CustomTile objective, Vector3Int originPos, Vector3Int objectivePos)
     {
         this.origin = origin;
         this.objective = objective;
+        this.originPos = originPos;
+        this.objectivePos = objectivePos;
     }
 }
