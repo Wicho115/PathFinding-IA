@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
-public class DijkstrasAlgorithm : MonoBehaviour
+public class AStart : MonoBehaviour
 {
     [FormerlySerializedAs("moveSelector")] [SerializeField] private PathSelector pathSelector;
 
@@ -25,8 +25,7 @@ public class DijkstrasAlgorithm : MonoBehaviour
     [SerializeField] private Version version = Version.Weight;
     enum Version
     {
-        Weight,
-        AStar
+        Weight
     }
 
     [SerializeField] private bool _endEarly = true;
@@ -84,14 +83,7 @@ public class DijkstrasAlgorithm : MonoBehaviour
                 if (!_costSoFar.ContainsKey(next) || newCost < _costSoFar[next])
                 {
                     _costSoFar.Add(next, newCost);
-                    var priority = newCost;
-                   
-                    if (version == Version.AStar)
-                    {
-                        priority += Heuristic(_objectivePos, next);
-                    }
-
-
+                    var priority = newCost + Heuristic(_objectivePos, next);
                     _frontier.Enqueue(next, priority);
                     _cameFrom.Add(next, current);
                 }

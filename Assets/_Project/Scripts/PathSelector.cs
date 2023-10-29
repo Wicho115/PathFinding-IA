@@ -32,9 +32,6 @@ public class PathSelector : MonoBehaviour
             originTile = null;
             objectiveTile = null;
         }
-        Debug.Log("CUSTOM TILE: " + tile.name);
-        Debug.Log("CUSTOM TILE COST: " + tile.Cost);
-        Debug.Log("CUSTOM TILE POS: " + pos);
         
         if (originTile == null)
         {
@@ -49,8 +46,6 @@ public class PathSelector : MonoBehaviour
         drawer.Draw(pos, objectiveTileDraw);
 
         OnMoveSelectionDone?.Invoke(new OnMoveSelectionArgs(originTile, objectiveTile, originPos, objectivePos));
-
-        
     }
 
     private void OnEnable()
