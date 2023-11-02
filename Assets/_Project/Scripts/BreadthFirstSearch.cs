@@ -26,9 +26,11 @@ public class BreadthFirstSearch : MonoBehaviour
         ReachedAndFill,
         CameFrom,
         EndEarly,
-        EndEarlyAndFill
+        EndEarlyAndFill,
     }
 
+    [SerializeField] private bool useHeuristics;
+    
     [Header("Visual Vars")]
     [SerializeField, Min(0)] private float _secondsPerTileChange;
     [SerializeField, Min(0)] private float _secondsPerNeighbourChange;
@@ -101,7 +103,7 @@ public class BreadthFirstSearch : MonoBehaviour
             foreach (var neighbour in tileMap.GetNeighbours(current))
             {
                 if (_reached.Contains(neighbour)) continue;
-                //Si no se ha alcanzado el vecino, se añade a la frontera y a los tiles alcanzados
+                //Si no se ha alcanzado el vecino, se aï¿½ade a la frontera y a los tiles alcanzados
                 AddToFrontier(neighbour);
                 AddToReached(neighbour);
 
@@ -139,7 +141,7 @@ public class BreadthFirstSearch : MonoBehaviour
             foreach (var neighbour in tileMap.GetNeighbours(current))
             {
                 if (_cameFrom.ContainsKey(neighbour)) continue;
-                //Si no se ha alcanzado el vecino, se añade a la frontera y a los tiles de donde viene
+                //Si no se ha alcanzado el vecino, se aï¿½ade a la frontera y a los tiles de donde viene
                 AddToFrontier(neighbour);
                 AddToCameFrom(neighbour, current);
                 if(neighbour == objectivePos && (version == Version.EndEarly || version == Version.EndEarlyAndFill))
@@ -176,6 +178,11 @@ public class BreadthFirstSearch : MonoBehaviour
         _isFilled = !_isFilled;
         algorithmCor = null;
         Debug.Log("End Algorithm");
+    }
+    
+    private int Heuristic(Vector3Int a, Vector3Int b)
+    {
+        return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
     }
 
     private void EndAlgorithmWithPath()

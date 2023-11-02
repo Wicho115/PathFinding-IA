@@ -3873,14 +3873,15 @@ MonoBehaviour:
   defaultTile: {fileID: 11400000, guid: 46e296473374040479b345fa712ddc5e, type: 2}
   originTile: {fileID: 11400000, guid: cf46c1248d426ca43935333750c157f5, type: 2}
   objectiveTile: {fileID: 11400000, guid: 137fad29653237a459426d53f9571794, type: 2}
-  fillTile: {fileID: 0}
+  fillTile: {fileID: 11400000, guid: 771e4f04583903a4d96d2247abf3b847, type: 2}
   pathToFollowTile: {fileID: 11400000, guid: 5f323d42f8c83da4b9fa0ccd8a8e2954, type: 2}
   tileDrawer: {fileID: 944716990}
   tileMap: {fileID: 351174319}
-  version: 0
+  version: 1
+  _paintIt: 1
   _endEarly: 1
   _secondsPerTileChange: 0
-  _secondsPerNeighbourChange: 0
+  _secondsPerNeighbourChange: 0.01
 --- !u!4 &1264557232
 Transform:
   m_ObjectHideFlags: 0
@@ -3933,6 +3934,7 @@ MonoBehaviour:
   pathToFollowTile: {fileID: 11400000, guid: a96bb1547d16bf74cba63db4f5962570, type: 2}
   tileMap: {fileID: 351174319}
   version: 0
+  useHeuristics: 0
   _secondsPerTileChange: 0.001
   _secondsPerNeighbourChange: 0.005
 --- !u!4 &1670054907

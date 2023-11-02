@@ -26,8 +26,11 @@ public class DijkstrasAlgorithm : MonoBehaviour
     enum Version
     {
         Weight,
+        Heuristics,
         AStar
     }
+
+    [SerializeField] private bool _paintIt;
 
     [SerializeField] private bool _endEarly = true;
 
@@ -85,18 +88,23 @@ public class DijkstrasAlgorithm : MonoBehaviour
                 {
                     _costSoFar.Add(next, newCost);
                     var priority = newCost;
-                   
-                    if (version == Version.AStar)
-                    {
-                        priority += Heuristic(_objectivePos, next);
-                    }
 
+                    priority = version switch 
+                    {
+                        Version.Heuristics => Heuristic(_objectivePos, next),
+                        Version.AStar => priority + Heuristic(_objectivePos, next),
+                        _ => priority
+                    };
 
                     _frontier.Enqueue(next, priority);
                     _cameFrom.Add(next, current);
+                    //Si se quiere pintar, pintalo
+                    if (_paintIt)
+                    {
+                        tileDrawer.Draw(next, fillTile);
+                        yield return new WaitForSeconds(_secondsPerNeighbourChange);
+                    }
                 }
-
-                //Si no se ha alcanzado el vecino, se añade a la frontera y a los tiles de donde viene
 
                 //Si el vecino es el final, se  termina
                 if (next == _objectivePos && _endEarly)
