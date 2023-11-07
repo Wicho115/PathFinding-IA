@@ -123,37 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &260580688
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 260580689}
-  m_Layer: 0
-  m_Name: Algorithm
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &260580689
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 260580688}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &351174316
 GameObject:
   m_ObjectHideFlags: 0
@@ -3481,7 +3450,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 504085647}
-  - component: {fileID: 504085646}
+  - component: {fileID: 504085649}
   - component: {fileID: 504085648}
   m_Layer: 0
   m_Name: TileSelector
@@ -3489,20 +3458,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &504085646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 504085645}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20e851fc00355cd488d254c80821bafc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tileMap: {fileID: 351174319}
+  m_IsActive: 1
 --- !u!4 &504085647
 Transform:
   m_ObjectHideFlags: 0
@@ -3527,13 +3483,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 504085645}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 09a4e3119b1c7ed41a9557b1da9a0f76, type: 3}
+  m_Script: {fileID: 11500000, guid: 021f911c16594cb081ce9f5b848def92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selector: {fileID: 504085646}
+  selector: {fileID: 504085649}
+  tilemapArea: {fileID: 351174319}
   drawer: {fileID: 944716990}
-  originTileDraw: {fileID: 11400000, guid: cf46c1248d426ca43935333750c157f5, type: 2}
-  objectiveTileDraw: {fileID: 11400000, guid: 137fad29653237a459426d53f9571794, type: 2}
+  originTileDraw: {fileID: 11400000, guid: fdbc84c071635774a8a3332ddd3b1aa4, type: 2}
+  areaTileDraw: {fileID: 11400000, guid: 94a3ed0b06108d4488004941f251dc0b, type: 2}
+  pathTileDraw: {fileID: 11400000, guid: f4e954228dfb1ac46b1c801b562d2b53, type: 2}
+  tilesToMove: 3
+--- !u!114 &504085649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504085645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20e851fc00355cd488d254c80821bafc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileMap: {fileID: 351174319}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
