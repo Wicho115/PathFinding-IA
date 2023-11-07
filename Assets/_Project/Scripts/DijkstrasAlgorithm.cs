@@ -80,6 +80,7 @@ public class DijkstrasAlgorithm : MonoBehaviour
 
             foreach (var next in tileMap.GetNeighbours(current))
             {
+                if (_cameFrom.ContainsKey(next)) continue;
                 var nextTile = tileMap.GetTile(next) as CustomTile;
                 if (nextTile == null) continue;
 
