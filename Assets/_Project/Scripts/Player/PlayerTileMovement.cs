@@ -51,7 +51,7 @@ public class PlayerTileMovement : MonoBehaviour, IPointerClickHandler
     {
         if (_isMoving) return;
         var cell = tilemapPlayer.WorldToCell(transform.position);
-        playerAreaSelector.ActivateArea(cell, 3);
+        playerAreaSelector.ActivateArea(cell, 7);
     }
     
     private void OnEnable()
