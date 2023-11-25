@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,10 +9,9 @@ using UnityEngine.Tilemaps;
 public class TileSimpleAnimator : MonoBehaviour
 {
     [SerializeField] private Tilemap tileMap;
-    private TileSelector _selector;
-    private Dictionary<Vector3Int, AnimationHandler> _activeTween = new Dictionary<Vector3Int, AnimationHandler>();
-
     
+    private TileSelector _selector;
+    private Dictionary<Vector3Int, AnimationHandler> _activeTween = new();
 
     private void Awake()
     {
@@ -20,23 +20,56 @@ public class TileSimpleAnimator : MonoBehaviour
 
     private void OnSelectedTile(CustomTile tile, Vector3Int pos)
     {
+        Debug.Log("Hoola selected tile anim");
         if (_activeTween.ContainsKey(pos)) return;
 
-        StartCoroutine(Animation(pos));
+        StartCoroutine(AnimationTest(pos));
     }
 
-    private IEnumerator Animation(Vector3Int pos)
+    private IEnumerator AnimationTest(Vector3Int cell)
     {
-        var matrix = tileMap.GetTransformMatrix(pos);
+        //init
+        var animHandler = new AnimationHandler();
+        _activeTween.Add(cell, animHandler);
         
+        //move
+        animHandler.MovePos(new Vector3(0,0,0), 1f);
+        yield return WaitTween(animHandler.tweenPos, animHandler, cell);
+        
+        //rotate
+        animHandler.MoveRot(new Vector3(0,90,0), .75f);
+        yield return WaitTween(animHandler.tweenRot, animHandler, cell);
+        
+        //rotate back
+        animHandler.MoveRot(animHandler.originalRot, .75f);
+        yield return WaitTween(animHandler.tweenRot, animHandler, cell);
+        
+        //move back
+        animHandler.MovePos(animHandler.originalPos, 1f);
+        yield return WaitTween(animHandler.tweenPos, animHandler, cell);
+        
+        _activeTween.Remove(cell);
+    }
 
-        yield return null;
+    private IEnumerator WaitTween(Tween tween, AnimationHandler animHandler, Vector3Int cell)
+    {
+        yield return new WaitUntil(() =>
+        {
+            SetMatrix(animHandler,cell);
+            return tween == null || !tween.IsPlaying() || tween.IsComplete();
+        });
+    }
+
+    private void SetMatrix(AnimationHandler animHandler, Vector3Int cell)
+    {
+        var matrix = Matrix4x4.TRS(animHandler.pos, animHandler.rot, animHandler.scale);
+        tileMap.SetTransformMatrix(cell, matrix);
     }
 
     private class AnimationHandler
     {
         public readonly Vector3 originalPos = new Vector3(0, -0.12f, 0);
-        public readonly Quaternion originalRot = Quaternion.identity;
+        public readonly Vector3 originalRot = Vector3.zero;
         public readonly Vector3 originalScale = Vector3.one;
 
         public Vector3 pos;
@@ -52,13 +85,13 @@ public class TileSimpleAnimator : MonoBehaviour
         public AnimationHandler(bool interruptTweens = false)
         {
             pos = originalPos;
-            rot = originalRot;
+            rot = Quaternion.Euler(originalRot);
             scale = originalScale;
 
             _interruptTweens = interruptTweens;
         }
 
-        public void MovePos(Vector3 toPos)
+        public void MovePos(Vector3 toPos, float seconds)
         {
             if(tweenPos != null && tweenPos.active)
             {
@@ -66,24 +99,31 @@ public class TileSimpleAnimator : MonoBehaviour
                 else return;
             }
 
+            tweenPos = DOTween.To(() => pos, value => pos = value, toPos, seconds)
+                .OnComplete(() => tweenPos = null);
         }
 
-        public void MoveRot(Quaternion toRot)
+        public void MoveRot(Vector3 toRot, float seconds)
         {
             if (tweenRot != null && tweenRot.active)
             {
                 if (_interruptTweens) tweenRot.Kill();
                 else return;
             }
+            tweenRot = DOTween.To(() => rot, value => rot = value, toRot, seconds)
+                .OnComplete(() => tweenRot = null);
         }
 
-        public void MoveScale(Vector3 toScale)
+        public void MoveScale(Vector3 toScale, float seconds)
         {
             if (tweenScale != null && tweenScale.active)
             {
                 if (_interruptTweens) tweenScale.Kill();
                 else return;
             }
+
+            tweenScale = DOTween.To(() => scale, value => scale = value, scale, seconds)
+                .OnComplete(() => tweenScale = null);
         }
     }
 
