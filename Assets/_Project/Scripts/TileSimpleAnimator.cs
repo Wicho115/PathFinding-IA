@@ -20,10 +20,62 @@ public class TileSimpleAnimator : MonoBehaviour
 
     private void OnSelectedTile(CustomTile tile, Vector3Int pos)
     {
-        Debug.Log("Hoola selected tile anim");
         if (_activeTween.ContainsKey(pos)) return;
 
-        StartCoroutine(AnimationTest(pos));
+        //StartCoroutine(AnimationTest(pos));
+
+        var cells = PathFindingAlgorithm.FillLimited(pos, 1, tileMap);
+        StartCoroutine(Anim2(cells));
+    }
+
+    private IEnumerator Anim2(List<Vector3Int> cells)
+    {
+        for (var i = 0; i < cells.Count - 1; i++)
+        {
+            StartCoroutine(AnimationTest(cells[i]));
+            yield return new WaitForSeconds(0.05f);
+        }
+        /*
+        Coroutine lastCor = null;
+        for(var i = 0; i < cells.Count - 1; i++)
+        {
+            var animHandler = new AnimationHandler();
+            _activeTween.Add(cells[i], animHandler);
+
+            animHandler.MovePos(new Vector3(0, 0, 0), 0.5f);
+
+            lastCor = StartCoroutine(WaitTween(animHandler.tweenPos, animHandler, cells[i]));
+            yield return new WaitForSeconds(0.005f);
+
+            if(i == cells.Count - 1)
+            {
+                Debug.Log("Esperando ultima cor");
+                yield return lastCor;
+            }
+        }
+        
+
+        for (var i = 0; i < cells.Count - 1; i++)
+        {
+            var animHandler = _activeTween[cells[i]];
+
+            animHandler.MovePos(animHandler.originalPos, 0.5f);
+
+            lastCor = StartCoroutine(WaitTween(animHandler.tweenPos, animHandler, cells[i]));
+            yield return new WaitForSeconds(0.04f);
+
+            if (i == cells.Count - 1)
+            {
+                Debug.Log("Esperando ultima cor");
+                yield return lastCor;
+            }
+        }
+
+        for (var i = 0; i < cells.Count - 1; i++)
+        {
+            _activeTween.Remove(cells[i]);
+        }
+        */
     }
 
     private IEnumerator AnimationTest(Vector3Int cell)
@@ -33,19 +85,24 @@ public class TileSimpleAnimator : MonoBehaviour
         _activeTween.Add(cell, animHandler);
         
         //move
-        animHandler.MovePos(new Vector3(0,0,0), 1f);
+        animHandler.MovePos(new Vector3(0,0,0), 0.5f);
+
         yield return WaitTween(animHandler.tweenPos, animHandler, cell);
         
         //rotate
+        /*
         animHandler.MoveRot(new Vector3(0,90,0), .75f);
         yield return WaitTween(animHandler.tweenRot, animHandler, cell);
+        */
         
         //rotate back
+        /*
         animHandler.MoveRot(animHandler.originalRot, .75f);
         yield return WaitTween(animHandler.tweenRot, animHandler, cell);
+        */
         
         //move back
-        animHandler.MovePos(animHandler.originalPos, 1f);
+        animHandler.MovePos(animHandler.originalPos, 0.5f);
         yield return WaitTween(animHandler.tweenPos, animHandler, cell);
         
         _activeTween.Remove(cell);
@@ -56,7 +113,7 @@ public class TileSimpleAnimator : MonoBehaviour
         yield return new WaitUntil(() =>
         {
             SetMatrix(animHandler,cell);
-            return tween == null || !tween.IsPlaying() || tween.IsComplete();
+            return tween == null || tween.IsComplete() || !tween.IsPlaying() ;
         });
     }
 
