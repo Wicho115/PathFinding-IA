@@ -15,11 +15,11 @@ public class DetectCellLocation : MonoBehaviour
     public TileBase original;
 
     [Header("Algorithms")]
-    public FloodFill startpoint;
-    public FloodFill endpoint;
-    public DikstrasAlgorithm Dikstrafloodfill;
-    public Heuristic Heuristicfloodfill;
-    public AEstrella AEstrellafloodfill;
+    public Socavon startpoint;
+    public Socavon endpoint;
+    //public DikstrasAlgorithm Dikstrafloodfill;
+    public Levitacion Heuristicfloodfill;
+    //public AEstrella AEstrellafloodfill;
 
     [Header("Active Algorithm")]
     public bool FloodFillAlg;
@@ -44,53 +44,53 @@ public class DetectCellLocation : MonoBehaviour
         if (FloodFillAlg == true)
         {
             FloodFill();
-            Dikstrafloodfill.enabled = false;
+            //Dikstrafloodfill.enabled = false;
             Heuristicfloodfill.enabled = false;
-            AEstrellafloodfill.enabled = false;
+            //AEstrellafloodfill.enabled = false;
         }
         else if (FloodFillEarlyExit == true)
         {
             FloodFill();
             startpoint.canstop = true;
-            Dikstrafloodfill.enabled = false;
+           // Dikstrafloodfill.enabled = false;
             Heuristicfloodfill.enabled = false;
-            AEstrellafloodfill.enabled = false;
+            //AEstrellafloodfill.enabled = false;
         }
         else if (DijkstrasAlg == true)
         {
-            Dijkstras();
+            //Dijkstras();
             startpoint.enabled = false;
             Heuristicfloodfill.enabled = false;
-            AEstrellafloodfill.enabled = false;
+           // AEstrellafloodfill.enabled = false;
         }
         else if (HeuristicAlg == true)
         {
             Heuristic();
-            Dikstrafloodfill.enabled = false;
+           // Dikstrafloodfill.enabled = false;
             startpoint.enabled = false;
-            AEstrellafloodfill.enabled = false;
+           // AEstrellafloodfill.enabled = false;
 
         }
         else if (HeuristicEarlyExit == true)
         {
             Heuristic();
-            Heuristicfloodfill.earlyExit = true;
-            Dikstrafloodfill.enabled = false;
+            //Heuristicfloodfill.earlyExit = true;
+            //Dikstrafloodfill.enabled = false;
             startpoint.enabled = false;
-            AEstrellafloodfill.enabled = false;
+            //AEstrellafloodfill.enabled = false;
 
         }
         else if (AEstrellaAlg == true){
-            AEstrella();
+            //AEstrella();
             startpoint.canstop = true;
-            Dikstrafloodfill.enabled = false;
+            //Dikstrafloodfill.enabled = false;
             Heuristicfloodfill.enabled = false;
         }
         else if (AEstrellaEarlyExit == true){
-            AEstrella();
-            AEstrellafloodfill.earlyExit = true;
+            //AEstrella();
+            //AEstrellafloodfill.earlyExit = true;
             startpoint.canstop = true;
-            Dikstrafloodfill.enabled = false;
+            //Dikstrafloodfill.enabled = false;
             Heuristicfloodfill.enabled = false;
         }
     }
@@ -154,7 +154,7 @@ public class DetectCellLocation : MonoBehaviour
         }
     }
 
-    public void Dijkstras()
+    /*public void Dijkstras()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -201,7 +201,7 @@ public class DetectCellLocation : MonoBehaviour
                 //tilemap.SetTile(originalTile.Value, encimado);
             }
         }
-    }
+    }*/
 
     public void Heuristic()
     {
@@ -252,7 +252,7 @@ public class DetectCellLocation : MonoBehaviour
         }
     }
 
-    public void AEstrella()
+    /*public void AEstrella()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -299,6 +299,6 @@ public class DetectCellLocation : MonoBehaviour
                 //tilemap.SetTile(originalTile.Value, encimado);
             }
         }
-    }
+    }*/
 }
 
