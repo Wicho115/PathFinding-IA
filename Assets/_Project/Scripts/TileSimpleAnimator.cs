@@ -9,6 +9,7 @@ using UnityEngine.Tilemaps;
 public class TileSimpleAnimator : MonoBehaviour
 {
     [SerializeField] private Tilemap tileMap;
+    [SerializeField, Min(1)] private int times = 3;
     
     private TileSelector _selector;
     private Dictionary<Vector3Int, AnimationHandler> _activeTween = new();
@@ -24,58 +25,19 @@ public class TileSimpleAnimator : MonoBehaviour
 
         //StartCoroutine(AnimationTest(pos));
 
-        var cells = PathFindingAlgorithm.FillLimited(pos, 1, tileMap);
-        StartCoroutine(Anim2(cells));
+        var cells = PathFindingAlgorithm.FillLimited(pos, times, tileMap);
+        StartCoroutine(Anim2(pos,cells));
     }
 
-    private IEnumerator Anim2(List<Vector3Int> cells)
-    {
+    private IEnumerator Anim2(Vector3Int originPos, List<Vector3Int> cells)
+    {    
+        
         for (var i = 0; i < cells.Count - 1; i++)
         {
+                  
             StartCoroutine(AnimationTest(cells[i]));
             yield return new WaitForSeconds(0.05f);
         }
-        /*
-        Coroutine lastCor = null;
-        for(var i = 0; i < cells.Count - 1; i++)
-        {
-            var animHandler = new AnimationHandler();
-            _activeTween.Add(cells[i], animHandler);
-
-            animHandler.MovePos(new Vector3(0, 0, 0), 0.5f);
-
-            lastCor = StartCoroutine(WaitTween(animHandler.tweenPos, animHandler, cells[i]));
-            yield return new WaitForSeconds(0.005f);
-
-            if(i == cells.Count - 1)
-            {
-                Debug.Log("Esperando ultima cor");
-                yield return lastCor;
-            }
-        }
-        
-
-        for (var i = 0; i < cells.Count - 1; i++)
-        {
-            var animHandler = _activeTween[cells[i]];
-
-            animHandler.MovePos(animHandler.originalPos, 0.5f);
-
-            lastCor = StartCoroutine(WaitTween(animHandler.tweenPos, animHandler, cells[i]));
-            yield return new WaitForSeconds(0.04f);
-
-            if (i == cells.Count - 1)
-            {
-                Debug.Log("Esperando ultima cor");
-                yield return lastCor;
-            }
-        }
-
-        for (var i = 0; i < cells.Count - 1; i++)
-        {
-            _activeTween.Remove(cells[i]);
-        }
-        */
     }
 
     private IEnumerator AnimationTest(Vector3Int cell)
@@ -184,6 +146,49 @@ public class TileSimpleAnimator : MonoBehaviour
         }
     }
 
+    #region ANIMACION
+    /*
+        Coroutine lastCor = null;
+        for(var i = 0; i < cells.Count - 1; i++)
+        {
+            var animHandler = new AnimationHandler();
+            _activeTween.Add(cells[i], animHandler);
+
+            animHandler.MovePos(new Vector3(0, 0, 0), 0.5f);
+
+            lastCor = StartCoroutine(WaitTween(animHandler.tweenPos, animHandler, cells[i]));
+            yield return new WaitForSeconds(0.005f);
+
+            if(i == cells.Count - 1)
+            {
+                Debug.Log("Esperando ultima cor");
+                yield return lastCor;
+            }
+        }
+        
+
+        for (var i = 0; i < cells.Count - 1; i++)
+        {
+            var animHandler = _activeTween[cells[i]];
+
+            animHandler.MovePos(animHandler.originalPos, 0.5f);
+
+            lastCor = StartCoroutine(WaitTween(animHandler.tweenPos, animHandler, cells[i]));
+            yield return new WaitForSeconds(0.04f);
+
+            if (i == cells.Count - 1)
+            {
+                Debug.Log("Esperando ultima cor");
+                yield return lastCor;
+            }
+        }
+
+        for (var i = 0; i < cells.Count - 1; i++)
+        {
+            _activeTween.Remove(cells[i]);
+        }
+        */
+    #endregion
 
     private void OnEnable()
     {

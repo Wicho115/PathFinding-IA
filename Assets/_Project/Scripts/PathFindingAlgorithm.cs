@@ -70,22 +70,6 @@ public static class PathFindingAlgorithm
         
         RestartPathFinding();
 
-        if (tilesToFill == 1)
-        {
-            Debug.Log("origin");
-            Debug.Log(originPos);
-            _reached.Add(originPos);
-            var neightbours = tileMap.GetNeighbours(originPos, true);
-
-            for(int i = 0; i < neightbours.Count - 1; i++)
-            {
-                Debug.Log("vecinos");
-                Debug.Log(neightbours[i]);
-                _reached.Add(neightbours[i]);
-            }
-
-            return new List<Vector3Int>(_reached);
-        }
 
         _frontier.Enqueue(originPos);
         _reached.Add(originPos);
