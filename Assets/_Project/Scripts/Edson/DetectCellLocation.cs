@@ -3,32 +3,21 @@ using UnityEngine.Tilemaps;
 
 public class DetectCellLocation : MonoBehaviour
 {
+
     [Header("World")]
     public GridLayout gridLayout;
     private Vector3 worldPosition;
 
     [Header("Tiles")]
     public Tilemap tilemap;
-    public TileBase origen;
-    public TileBase destino;
-    public TileBase encimado;
-    public TileBase original;
-
+    
     [Header("Algorithms")]
-    public Socavon startpoint;
-    public Socavon endpoint;
-    //public DikstrasAlgorithm Dikstrafloodfill;
-    public Levitacion Heuristicfloodfill;
-    //public AEstrella AEstrellafloodfill;
+    public Socavon socpow;
+    public Levitacion levitpow;
 
     [Header("Active Algorithm")]
-    public bool FloodFillAlg;
-    public bool FloodFillEarlyExit;
-    public bool DijkstrasAlg;
-    public bool HeuristicAlg;
-    public bool HeuristicEarlyExit;
-    public bool AEstrellaAlg;
-    public bool AEstrellaEarlyExit;
+    public bool Socav;
+    public bool Levit;
 
     private TileBase originalTileBase;
     private Vector3Int? origenTile;
@@ -41,57 +30,28 @@ public class DetectCellLocation : MonoBehaviour
     }
     private void Update()
     {
-        if (FloodFillAlg == true)
+        if(Input.GetKeyDown(KeyCode.Alpha1)){
+            Socav = true;
+            Levit = false;
+        }
+        else if(Input.GetKeyDown(KeyCode.Alpha2)){
+            Levit = true;
+            Socav = false;
+        }
+
+
+        if (Socav == true)
         {
             FloodFill();
-            //Dikstrafloodfill.enabled = false;
-            Heuristicfloodfill.enabled = false;
-            //AEstrellafloodfill.enabled = false;
-        }
-        else if (FloodFillEarlyExit == true)
-        {
-            FloodFill();
-            startpoint.canstop = true;
-           // Dikstrafloodfill.enabled = false;
-            Heuristicfloodfill.enabled = false;
-            //AEstrellafloodfill.enabled = false;
-        }
-        else if (DijkstrasAlg == true)
-        {
-            //Dijkstras();
-            startpoint.enabled = false;
-            Heuristicfloodfill.enabled = false;
-           // AEstrellafloodfill.enabled = false;
-        }
-        else if (HeuristicAlg == true)
-        {
-            Heuristic();
-           // Dikstrafloodfill.enabled = false;
-            startpoint.enabled = false;
-           // AEstrellafloodfill.enabled = false;
+            socpow.enabled = true;
+            levitpow.enabled = false;
 
         }
-        else if (HeuristicEarlyExit == true)
+        else if (Levit == true)
         {
             Heuristic();
-            //Heuristicfloodfill.earlyExit = true;
-            //Dikstrafloodfill.enabled = false;
-            startpoint.enabled = false;
-            //AEstrellafloodfill.enabled = false;
-
-        }
-        else if (AEstrellaAlg == true){
-            //AEstrella();
-            startpoint.canstop = true;
-            //Dikstrafloodfill.enabled = false;
-            Heuristicfloodfill.enabled = false;
-        }
-        else if (AEstrellaEarlyExit == true){
-            //AEstrella();
-            //AEstrellafloodfill.earlyExit = true;
-            startpoint.canstop = true;
-            //Dikstrafloodfill.enabled = false;
-            Heuristicfloodfill.enabled = false;
+            levitpow.enabled = true;
+            socpow.enabled = false;
         }
     }
     private Vector3Int GetPosition()
@@ -111,14 +71,7 @@ public class DetectCellLocation : MonoBehaviour
             var actualTile = tilemap.GetTile(GetPosition());
             if (actualTile == null) { return; }
             Debug.Log("Origen " + GetPosition());
-            //tilemap.SetTile(GetPosition(), origen);
-
-            startpoint.startingPoint = GetPosition();
-
-            if (origenTile != null)
-            {
-                //tilemap.SetTile(origenTile.Value, original);
-            }
+            socpow.startingPoint = GetPosition();
             origenTile = GetPosition();
         }
 
@@ -126,83 +79,17 @@ public class DetectCellLocation : MonoBehaviour
         {
             var actualTile = tilemap.GetTile(GetPosition());
             if (actualTile == null) { return; }
-            //tilemap.SetTile(GetPosition(), destino);
             Debug.Log("Destino " + GetPosition());
-            endpoint.objective = GetPosition();
-
-            if (destinoTile != null)
-            {
-                //tilemap.SetTile(destinoTile.Value, original);
-            }
+            socpow.objective = GetPosition();
             destinoTile = GetPosition();
         }
 
         if (originalTile != GetPosition())
         {
-            if (originalTile != null && originalTileBase != null && originalTile.Value != origenTile && originalTile.Value != destinoTile)
-            {
-                //tilemap.SetTile(originalTile.Value, originalTileBase);
-            }
-
             originalTile = GetPosition();
             originalTileBase = tilemap.GetTile(GetPosition());
-
-            if (tilemap.GetSprite(GetPosition()) != null && originalTile.Value != origenTile && originalTile.Value != destinoTile)
-            {
-                //tilemap.SetTile(originalTile.Value, encimado);
-            }
         }
     }
-
-    /*public void Dijkstras()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            var actualTile = tilemap.GetTile(GetPosition());
-            if (actualTile == null) { return; }
-            Debug.Log("Origen " + GetPosition());
-            //tilemap.SetTile(GetPosition(), origen);
-            Dikstrafloodfill.startingPoint = GetPosition();
-
-            if (origenTile != null)
-            {
-                //tilemap.SetTile(origenTile.Value, original);
-            }
-            origenTile = GetPosition();
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            var actualTile = tilemap.GetTile(GetPosition());
-            if (actualTile == null) { return; }
-            //tilemap.SetTile(GetPosition(), destino);
-            Debug.Log("Destino " + GetPosition());
-            Dikstrafloodfill.objective = GetPosition();
-
-            if (destinoTile != null)
-            {
-                //tilemap.SetTile(destinoTile.Value, original);
-            }
-            destinoTile = GetPosition();
-        }
-
-        if (originalTile != GetPosition())
-        {
-            if (originalTile != null && originalTileBase != null && originalTile.Value != origenTile && originalTile.Value != destinoTile)
-            {
-                //tilemap.SetTile(originalTile.Value, originalTileBase);
-            }
-
-            originalTile = GetPosition();
-            originalTileBase = tilemap.GetTile(GetPosition());
-
-            if (tilemap.GetSprite(GetPosition()) != null && originalTile.Value != origenTile && originalTile.Value != destinoTile)
-            {
-                //tilemap.SetTile(originalTile.Value, encimado);
-            }
-        }
-    }*/
-
     public void Heuristic()
     {
         if (Input.GetMouseButtonDown(0))
@@ -210,13 +97,7 @@ public class DetectCellLocation : MonoBehaviour
             var actualTile = tilemap.GetTile(GetPosition());
             if (actualTile == null) { return; }
             Debug.Log("Origen " + GetPosition());
-            //tilemap.SetTile(GetPosition(), origen);
-            Heuristicfloodfill.startingPoint = GetPosition();
-
-            if (origenTile != null)
-            {
-                //tilemap.SetTile(origenTile.Value, original);
-            }
+            levitpow.startingPoint = GetPosition();
             origenTile = GetPosition();
         }
 
@@ -224,81 +105,16 @@ public class DetectCellLocation : MonoBehaviour
         {
             var actualTile = tilemap.GetTile(GetPosition());
             if (actualTile == null) { return; }
-            //tilemap.SetTile(GetPosition(), destino);
             Debug.Log("Destino " + GetPosition());
-            Heuristicfloodfill.objective = GetPosition();
-
-            if (destinoTile != null)
-            {
-                //tilemap.SetTile(destinoTile.Value, original);
-            }
+            levitpow.objective = GetPosition();
             destinoTile = GetPosition();
         }
 
         if (originalTile != GetPosition())
         {
-            if (originalTile != null && originalTileBase != null && originalTile.Value != origenTile && originalTile.Value != destinoTile)
-            {
-                //tilemap.SetTile(originalTile.Value, originalTileBase);
-            }
-
             originalTile = GetPosition();
             originalTileBase = tilemap.GetTile(GetPosition());
-
-            if (tilemap.GetSprite(GetPosition()) != null && originalTile.Value != origenTile && originalTile.Value != destinoTile)
-            {
-                //tilemap.SetTile(originalTile.Value, encimado);
-            }
         }
     }
-
-    /*public void AEstrella()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            var actualTile = tilemap.GetTile(GetPosition());
-            if (actualTile == null) { return; }
-            Debug.Log("Origen " + GetPosition());
-            //tilemap.SetTile(GetPosition(), origen);
-            AEstrellafloodfill.startingPoint = GetPosition();
-
-            if (origenTile != null)
-            {
-                //tilemap.SetTile(origenTile.Value, original);
-            }
-            origenTile = GetPosition();
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            var actualTile = tilemap.GetTile(GetPosition());
-            if (actualTile == null) { return; }
-            //tilemap.SetTile(GetPosition(), destino);
-            Debug.Log("Destino " + GetPosition());
-            AEstrellafloodfill.objective = GetPosition();
-
-            if (destinoTile != null)
-            {
-                //tilemap.SetTile(destinoTile.Value, original);
-            }
-            destinoTile = GetPosition();
-        }
-
-        if (originalTile != GetPosition())
-        {
-            if (originalTile != null && originalTileBase != null && originalTile.Value != origenTile && originalTile.Value != destinoTile)
-            {
-                //tilemap.SetTile(originalTile.Value, originalTileBase);
-            }
-
-            originalTile = GetPosition();
-            originalTileBase = tilemap.GetTile(GetPosition());
-
-            if (tilemap.GetSprite(GetPosition()) != null && originalTile.Value != origenTile && originalTile.Value != destinoTile)
-            {
-                //tilemap.SetTile(originalTile.Value, encimado);
-            }
-        }
-    }*/
 }
 

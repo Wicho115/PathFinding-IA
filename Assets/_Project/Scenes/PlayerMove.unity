@@ -3872,15 +3872,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef790b8786479524581caeeb9d1b7be4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  range: 5
+  range: 3
   startingPoint: {x: 0, y: 0, z: 0}
   objective: {x: 0, y: 0, z: 0}
   tilemap: {fileID: 351174319}
-  pintador: {fileID: 11400000, guid: 771e4f04583903a4d96d2247abf3b847, type: 2}
-  camino: {fileID: 11400000, guid: a96bb1547d16bf74cba63db4f5962570, type: 2}
-  delay: 0
+  delay: 0.05
   canstop: 0
-  canRun: 1
 --- !u!114 &972634673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3895,20 +3892,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridLayout: {fileID: 1053971284}
   tilemap: {fileID: 351174319}
-  origen: {fileID: 11400000, guid: b20845e2a1f595a4f9561cf4393dfc17, type: 2}
-  destino: {fileID: 11400000, guid: e286f8df28ccb514288ecdb7cf688ddc, type: 2}
-  encimado: {fileID: 11400000, guid: a96bb1547d16bf74cba63db4f5962570, type: 2}
-  original: {fileID: 11400000, guid: 4b1fdd61d33d9914b8995e0339b27c35, type: 2}
-  startpoint: {fileID: 972634670}
-  endpoint: {fileID: 972634670}
-  Heuristicfloodfill: {fileID: 972634674}
-  FloodFillAlg: 0
-  FloodFillEarlyExit: 0
-  DijkstrasAlg: 0
-  HeuristicAlg: 1
-  HeuristicEarlyExit: 0
-  AEstrellaAlg: 0
-  AEstrellaEarlyExit: 0
+  socpow: {fileID: 972634670}
+  levitpow: {fileID: 972634674}
+  Socav: 0
+  Levit: 0
 --- !u!114 &972634674
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3925,9 +3912,8 @@ MonoBehaviour:
   startingPoint: {x: 0, y: 0, z: 0}
   objective: {x: 0, y: 0, z: 0}
   tilemap: {fileID: 351174319}
-  delay: 0
+  delay: 0.05
   canstop: 0
-  canRun: 1
 --- !u!1 &1053971283
 GameObject:
   m_ObjectHideFlags: 0
@@ -4089,6 +4075,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileMap: {fileID: 351174319}
+  times: 3
 --- !u!114 &1364284840
 MonoBehaviour:
   m_ObjectHideFlags: 0
