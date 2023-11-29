@@ -19,6 +19,8 @@ public class DetectCellLocation : MonoBehaviour
     public bool Socav;
     public bool Levit;
 
+    public TileSimpleAnimator animator;
+
     private TileBase originalTileBase;
     private Vector3Int? origenTile;
     private Vector3Int? originalTile;
@@ -38,14 +40,39 @@ public class DetectCellLocation : MonoBehaviour
             Levit = true;
             Socav = false;
         }
+        else if(Input.GetKeyDown(KeyCode.Alpha3)){
+            Levit = false;
+            Socav = false;
+            socpow.enabled = false;
+            levitpow.enabled = false;
+        }
 
+        if (Input.GetKeyDown(KeyCode.Space) && origenTile != null && !Levit && !Socav)
+        {
+            animator.DoAnimation(origenTile.Value);
+        }
+
+        if (!Socav && !Levit)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                var actualTile = tilemap.GetTile(GetPosition());
+                if (actualTile == null)
+                {
+                    return;
+                }
+
+                Debug.Log("Origen " + GetPosition());
+                socpow.startingPoint = GetPosition();
+                origenTile = GetPosition();
+            }
+        }
 
         if (Socav == true)
         {
             FloodFill();
             socpow.enabled = true;
             levitpow.enabled = false;
-
         }
         else if (Levit == true)
         {
@@ -64,6 +91,7 @@ public class DetectCellLocation : MonoBehaviour
         cellPosition.z = 0;
         return cellPosition;
     }
+    
     public void FloodFill()
     {
         if (Input.GetMouseButtonDown(0))

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Tilemaps;
@@ -19,7 +20,12 @@ public class TileSimpleAnimator : MonoBehaviour
         _selector = GetComponent<TileSelector>();
     }
 
-    private void OnSelectedTile(CustomTile tile, Vector3Int pos)
+    private void OnSelectedTile(CustomTile _, Vector3Int pos)
+    {
+        //DoAnimation(pos);
+    }
+
+    public void DoAnimation(Vector3Int pos)
     {
         if (_activeTween.ContainsKey(pos)) return;
 
@@ -31,10 +37,8 @@ public class TileSimpleAnimator : MonoBehaviour
 
     private IEnumerator Anim2(Vector3Int originPos, List<Vector3Int> cells)
     {    
-        
-        for (var i = 0; i < cells.Count - 1; i++)
+        for (var i = 0; i < cells.Count; i++)
         {
-                  
             StartCoroutine(AnimationTest(cells[i]));
             yield return new WaitForSeconds(0.05f);
         }
